@@ -34,5 +34,24 @@ namespace Pessoa.Servico.Idade
                 Dias = dias
             };
         }
+
+        public IdadeModel IdadeInteira(DateTime nascimentoInteira)
+        {
+            var hoje = DateTime.Today; //retorna a data atual sem as horas.
+            var idadeInt = hoje.Year - nascimentoInteira.Year;
+            
+            if (nascimentoInteira.Date > hoje.AddYears(-idadeInt)) idadeInt--;
+
+            var anos = idadeInt;
+           
+           return new IdadeModel
+            {
+                IdadeInteira = idadeInt,
+                Anos = anos,
+               
+            };
+        }
     }
+
+
 }

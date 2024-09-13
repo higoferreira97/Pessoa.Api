@@ -12,11 +12,11 @@ namespace Pessoa.Api.Controllers
     [Route("[controller]")]
     public class PessoaController : ControllerBase
     {
-        private readonly IdadeService _idadeService;
+        private readonly IdadeService idadeService;
 
         public PessoaController()
         {
-            _idadeService = new IdadeService();
+            idadeService = new IdadeService();
         }
 
         [HttpGet(), Route("validarIdade")]
@@ -24,7 +24,7 @@ namespace Pessoa.Api.Controllers
         {
             if (DateTime.TryParseExact(dataNascimento, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime dataNasc))
             {
-                var idade = _idadeService.CalcularIdade(dataNasc);
+                var idade = idadeService.CalcularIdade(dataNasc);
                 return Ok(idade);
             }
 
@@ -32,10 +32,21 @@ namespace Pessoa.Api.Controllers
 
         }
 
+        [HttpGet(), Route("validarIdadeInteiro")]
+        public ActionResult<IdadeModel> ValidarIdadeIn([FromQuery] string nascimentoInteira)
+        {
+            if (DateTime.TryParseExact(nascimentoInteira, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime nasciInteira))
+            {
+                var idade = idadeService.IdadeInteira(nasciInteira);
+                return Ok(idade);
+            }
 
+            return BadRequest("Data de nascimento inválida. Use o formato dd/MM/yyyy.");
+        }
 
+       
 
-        [HttpGet(), Route("validar - cpf")]
+        [HttpGet(), Route("validarCpf")]
         public IActionResult ValidarCPF([FromQuery] string cpf)
         {
             if (string.IsNullOrEmpty(cpf))
@@ -54,7 +65,7 @@ namespace Pessoa.Api.Controllers
         }
 
 
-        [HttpGet(), Route("validar cpf e idade")]
+        [HttpGet(), Route("validarCpfeIdade")]
         public IActionResult ValidarCPFIdade([FromQuery] string cpf, [FromQuery] string dataNascimento) 
         {
             if (string.IsNullOrEmpty(cpf))
@@ -69,17 +80,16 @@ namespace Pessoa.Api.Controllers
             if (!DateTime.TryParseExact(dataNascimento, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime dataNasc))
                 return BadRequest("Data de nascimento inválida. Use o formato dd/MM/yyyy.");
 
-            var idade = _idadeService.CalcularIdade(dataNasc);
+            var idade = idadeService.CalcularIdade(dataNasc);
 
             if (idade.IdadeInteira >= 18)
             {
                 return Ok(new { Mensagem = "CPF válido e a pessoa é maior de 18 anos." });
             }
 
-            else
-            {
+         
                 return BadRequest(new { Mensagem = "A pessoa é menor de 18 anos." });
-            }
+            
 
         }
 
